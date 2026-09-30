@@ -265,12 +265,23 @@
 
         // Talk to the desktop wrapper (launcher.py), if present
         function notifyApp(payload) {
-            try {
-                window.webkit.messageHandlers.app.postMessage(JSON.stringify(payload));
-            } catch (e) {
-                // running in a plain browser tab, no wrapper listening
-            }
-        }
+
+    // Windows WebView2
+    if (window.chrome?.webview) {
+        window.chrome.webview.postMessage(payload);
+        return;
+    }
+
+    // Linux WebKitGTK
+    if (
+        window.webkit?.messageHandlers?.app
+    ) {
+        window.webkit.messageHandlers.app.postMessage(
+            JSON.stringify(payload)
+        );
+        return;
+    }
+}
 
         minimizeBtn.addEventListener('click', () => notifyApp({ action: 'minimize' }));
         closeBtn.addEventListener('click', () => notifyApp({ action: 'close' }));
